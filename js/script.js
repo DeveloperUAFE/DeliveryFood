@@ -1,3 +1,5 @@
+const socket = io('https://SocketServer.ivanua1.repl.co')
+socket.emit('test', { username: 1 })
 window.addEventListener('DOMContentLoaded', () => {
 	// Tabs
 	const tabs = document.querySelectorAll('.tabheader__item'),
@@ -40,7 +42,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// Timer
 
-	const deadLine = '2023-04-02'
+	const deadLine = '2023-05-02'
 
 	function getTimeRemaining(endTime) {
 		const time = Date.parse(endTime) - new Date(),
@@ -101,12 +103,11 @@ window.addEventListener('DOMContentLoaded', () => {
 	modalOpenButtons.forEach(button => {
 		button.addEventListener('click', () => {
 			openModal(modal, modalDialog)
-			isModalOpen = true
 		})
 	})
 
 	document.addEventListener('keydown', event => {
-		if (event.code === 'Escape' && isModalOpen) {
+		if (event.code === 'Escape') {
 			closeModal(modal, modalDialog)
 		}
 	})
@@ -114,7 +115,6 @@ window.addEventListener('DOMContentLoaded', () => {
 	modal.addEventListener('click', event => {
 		if (event.target === modal || event.target.hasAttribute('data-close')) {
 			closeModal(modal, modalDialog)
-			isModalOpen = false
 		}
 	})
 
@@ -122,18 +122,24 @@ window.addEventListener('DOMContentLoaded', () => {
 		blackScreen.classList.add('show')
 		dialog.classList.add('show')
 		document.body.style.overflow = 'hidden'
+		isModalOpen = true
 		clearInterval(modalTimerId)
 	}
 
 	function closeModal(blackScreen, dialog) {
 		blackScreen.classList.remove('show')
 		dialog.classList.remove('show')
+		isModalOpen = false
 		document.body.style.overflow = ''
 	}
 
 	const modalTimerId = setTimeout(() => {
 		openModal(modal, modalDialog)
 	}, 3000)
+
+	// document.addEventListener('scroll', () => {
+	// 	showModalByScroll()
+	// })
 
 	function showModalByScroll() {
 		if (
@@ -145,10 +151,6 @@ window.addEventListener('DOMContentLoaded', () => {
 			document.removeEventListener('scroll', showModalByScroll)
 		}
 	}
-
-	document.addEventListener('scroll', () => {
-		showModalByScroll()
-	})
 
 	// Template
 
@@ -259,36 +261,66 @@ window.addEventListener('DOMContentLoaded', () => {
 			event.preventDefault()
 			const statusMessage = document.createElement('div')
 			statusMessage.classList.add('status')
-			statusMessage.textContent = message.loading
+			statusMessage.textContent = message.success
 			form.append(statusMessage)
 
-			const request = new XMLHttpRequest()
+			// const phoneNumber =
+			// 		this.previousElementSibling.previousElementSibling.value.trim(),
+			// 	userName =
+			// 		this.previousElementSibling.previousElementSibling.previousElementSibling.value.trim()
+
 			const formData = new FormData(form)
-
-			request.open('POST', 'server.php')
-			request.setRequestHeader('Content-type', 'application/json')
-
 			const object = {}
 			formData.forEach(function (value, key) {
 				object[key] = value
 			})
-			const json = JSON.stringify(object)
+			console.log(object)
+			let test = socket.emit('sendData', object)
 
-			request.send(json)
-
-			request.addEventListener('load', () => {
-				if (request.status === 200) {
-					console.log(request.response)
-					form.reset()
-					statusMessage.textContent = message.success
-
-					setTimeout(() => {
-						statusMessage.remove()
-					}, 2000)
-				} else {
-					statusMessage.textContent = message.failure
-				}
+			test.addEventListener('load', () => {
+				statusMessage.textContent = message.loading
 			})
+
+			// const request = new XMLHttpRequest()
+
+			// request.open('POST', 'server.php')
+			// request.setRequestHeader('Content-type', 'application/json')
+
+			// const object = {}
+			// formData.forEach(function (value, key) {
+			// 	object[key] = value
+			// })
+			// const json = JSON.stringify(object)
+
+			// 	request.send(json)
+
+			// 	request.addEventListener('load', () => {
+			// 		if (request.status === 200) {
+			// 			console.log(request.response)
+			// 			form.reset()
+			// 			statusMessage.textContent = message.success
+
+			setTimeout(() => {
+				statusMessage.remove()
+			}, 2000)
+			// 		} else {
+			// 			statusMessage.textContent = message.failure
+			// 		}
+			// 	})
 		})
 	}
+
+	// const btn = document.querySelector('#callMe')
+	// btn.onclick = function (e) {
+	// 	e.preventDefault()
+	// 	const phoneNumber =
+	// 			this.previousElementSibling.previousElementSibling.value.trim(),
+	// 		userName =
+	// 			this.previousElementSibling.previousElementSibling.previousElementSibling.value.trim()
+
+	// 	socket.emit('sendData', {
+	// 		user: userName,
+	// 		phone: phoneNumber,
+	// 	})
+	// }
 })
