@@ -135,11 +135,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	const modalTimerId = setTimeout(() => {
 		openModal(modal, modalDialog)
-	}, 3000)
+	}, 50000)
 
-	// document.addEventListener('scroll', () => {
-	// 	showModalByScroll()
-	// })
+	document.addEventListener('scroll', () => {
+		showModalByScroll()
+	})
 
 	function showModalByScroll() {
 		if (
@@ -246,12 +246,23 @@ window.addEventListener('DOMContentLoaded', () => {
 
 	// Forms
 
+	// const phoneNumber =
+	// 		this.previousElementSibling.previousElementSibling.value.trim(),
+	// 	userName =
+	// 		this.previousElementSibling.previousElementSibling.previousElementSibling.value.trim()
+	// console.log(object)
+	// let test = socket.emit('sendData', object)
+
+	// test.addEventListener('load', () => {
+	// 	statusMessage.textContent = message.loading
+	// })
+
 	const forms = document.querySelectorAll('form')
 
 	const message = {
-		loading: 'Loading',
-		success: "Thanks! I'll get you response!",
-		failure: 'Oh... somethings went wrong...',
+		loading: 'img/form/spinner.svg',
+		success: "Thanks! I'll get you response! I'll call you soon.",
+		failure: 'Oh, somethings went wrong...',
 	}
 
 	forms.forEach(item => postData(item))
@@ -259,68 +270,63 @@ window.addEventListener('DOMContentLoaded', () => {
 	function postData(form) {
 		form.addEventListener('submit', event => {
 			event.preventDefault()
-			const statusMessage = document.createElement('div')
-			statusMessage.classList.add('status')
-			statusMessage.textContent = message.success
+			const statusMessage = document.createElement('img')
+			statusMessage.src = message.loading
+			statusMessage.style.cssText = `
+				display: block;
+				margin: 0 auto;
+			`
 			form.append(statusMessage)
 
-			// const phoneNumber =
-			// 		this.previousElementSibling.previousElementSibling.value.trim(),
-			// 	userName =
-			// 		this.previousElementSibling.previousElementSibling.previousElementSibling.value.trim()
-
+			const request = new XMLHttpRequest()
 			const formData = new FormData(form)
+
+			request.open('POST', 'server.php')
+			request.setRequestHeader('Content-type', 'application/json')
+
 			const object = {}
 			formData.forEach(function (value, key) {
 				object[key] = value
 			})
-			console.log(object)
-			let test = socket.emit('sendData', object)
+			const json = JSON.stringify(object)
 
-			test.addEventListener('load', () => {
-				statusMessage.textContent = message.loading
+			request.send(json)
+
+			request.addEventListener('load', () => {
+				if (request.status === 200) {
+					console.log(request.response)
+					showThanksModal(message.success)
+					form.reset()
+					statusMessage.remove()
+				} else {
+					showThanksModal(message.failure)
+				}
 			})
-
-			// const request = new XMLHttpRequest()
-
-			// request.open('POST', 'server.php')
-			// request.setRequestHeader('Content-type', 'application/json')
-
-			// const object = {}
-			// formData.forEach(function (value, key) {
-			// 	object[key] = value
-			// })
-			// const json = JSON.stringify(object)
-
-			// 	request.send(json)
-
-			// 	request.addEventListener('load', () => {
-			// 		if (request.status === 200) {
-			// 			console.log(request.response)
-			// 			form.reset()
-			// 			statusMessage.textContent = message.success
-
-			setTimeout(() => {
-				statusMessage.remove()
-			}, 2000)
-			// 		} else {
-			// 			statusMessage.textContent = message.failure
-			// 		}
-			// 	})
 		})
 	}
 
-	// const btn = document.querySelector('#callMe')
-	// btn.onclick = function (e) {
-	// 	e.preventDefault()
-	// 	const phoneNumber =
-	// 			this.previousElementSibling.previousElementSibling.value.trim(),
-	// 		userName =
-	// 			this.previousElementSibling.previousElementSibling.previousElementSibling.value.trim()
+	function showThanksModal(message) {
+		const prevModalDialog = document.querySelector('.modal__dialog')
 
-	// 	socket.emit('sendData', {
-	// 		user: userName,
-	// 		phone: phoneNumber,
-	// 	})
-	// }
+		prevModalDialog.classList.add('hide')
+		openModal(modal, modalDialog)
+
+		const thanksModal = document.createElement('div')
+		thanksModal.classList.add('modal__dialog')
+		thanksModal.innerHTML = `
+			<div class="modal__content">
+
+				<div class="modal__close" data-close>×</div>
+				<div class="modal__title">${message}</div>
+
+			</div>
+		`
+		document.querySelector('.modal').append(thanksModal)
+		setTimeout(() => {
+			thanksModal.remove()
+			prevModalDialog.classList.add('show')
+			prevModalDialog.classList.remove('hide')
+			closeModal(modal, modalDialog)
+		}, 4000)
+	}
 })
