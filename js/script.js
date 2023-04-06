@@ -202,15 +202,15 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	const getResource = async url => {
-		const resolve = await fetch(url)
+	// const getResource = async url => {
+	// 	const resolve = await fetch(url)
 
-		if (!resolve.ok) {
-			throw new Error(`Could not fetch ${url}, status: ${resolve.status}`)
-		}
+	// 	if (!resolve.ok) {
+	// 		throw new Error(`Could not fetch ${url}, status: ${resolve.status}`)
+	// 	}
 
-		return await resolve.json()
-	}
+	// 	return await resolve.json()
+	// }
 
 	// getResource('http://localhost:3000/menu').then(data => {
 	// 	data.forEach(({ img, altimg, title, descr, price }) => {
@@ -358,7 +358,41 @@ window.addEventListener('DOMContentLoaded', () => {
 		}, 4000)
 	}
 
-	fetch('http://localhost:3000/menu')
-		.then(data => data.json())
-		.then(res => console.log(res))
+	// slides
+
+	const allSlides = document.querySelectorAll('.offer__slide'),
+		prev = document.querySelector('.offer__slider-prev'),
+		next = document.querySelector('.offer__slider-next'),
+		current = document.querySelector('#current'),
+		total = document.querySelector('#total')
+	let indexOfSlide = 0
+
+	next.addEventListener('click', () => plusSlides())
+	prev.addEventListener('click', () => minusSlides())
+
+	function plusSlides() {
+		indexOfSlide++
+		if (indexOfSlide >= allSlides.length) {
+			indexOfSlide = 0
+		}
+		showSlide(indexOfSlide)
+	}
+
+	function minusSlides() {
+		indexOfSlide--
+		if (indexOfSlide < 0) {
+			indexOfSlide = allSlides.length - 1
+		}
+		showSlide(indexOfSlide)
+	}
+
+	total.textContent = `0${allSlides.length}`
+
+	function showSlide(index) {
+		allSlides.forEach(item => {
+			item.style.display = 'none'
+		})
+		allSlides[index].style.display = 'block'
+		current.textContent = `0${index + 1}`
+	}
 })
