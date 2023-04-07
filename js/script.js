@@ -364,35 +364,73 @@ window.addEventListener('DOMContentLoaded', () => {
 		prev = document.querySelector('.offer__slider-prev'),
 		next = document.querySelector('.offer__slider-next'),
 		current = document.querySelector('#current'),
-		total = document.querySelector('#total')
-	let indexOfSlide = 0
+		total = document.querySelector('#total'),
+		slidesWrapper = document.querySelector('.offer__slider-wrapper'),
+		slidesField = document.querySelector('.offer__slider-inner'),
+		width = window.getComputedStyle(slidesWrapper).width
 
-	next.addEventListener('click', () => plusSlides())
-	prev.addEventListener('click', () => minusSlides())
+	let indexOfSlide = 1,
+		offset = 0
 
-	function plusSlides() {
-		indexOfSlide++
-		if (indexOfSlide >= allSlides.length) {
-			indexOfSlide = 0
+	if (allSlides.length < 10) {
+		total.textContent = `0${allSlides.length}`
+		current.textContent = `0${indexOfSlide}`
+	} else {
+		total.textContent = allSlides.length
+		current.textContent = indexOfSlide
+	}
+
+	slidesField.style.cssText = `
+		display: flex;
+		transition: 0.5s all;
+		width: ${100 * allSlides.length}%;
+	`
+
+	slidesWrapper.style.overflow = 'hidden'
+
+	allSlides.forEach(item => {
+		item.style.width = width
+	})
+
+	next.addEventListener('click', () => {
+		if (offset === +width.slice(0, width.length - 2) * (allSlides.length - 1)) {
+			offset = 0
+		} else {
+			offset += +width.slice(0, width.length - 2)
 		}
-		showSlide(indexOfSlide)
-	}
 
-	function minusSlides() {
-		indexOfSlide--
-		if (indexOfSlide < 0) {
-			indexOfSlide = allSlides.length - 1
+		slidesField.style.transform = `translateX(-${offset}px)`
+		if (indexOfSlide == allSlides.length) {
+			indexOfSlide = 1
+		} else {
+			indexOfSlide++
 		}
-		showSlide(indexOfSlide)
-	}
 
-	total.textContent = `0${allSlides.length}`
+		if (allSlides.length < 10) {
+			current.textContent = `0${indexOfSlide}`
+		} else {
+			current.textContent = indexOfSlide
+		}
+	})
 
-	function showSlide(index) {
-		allSlides.forEach(item => {
-			item.style.display = 'none'
-		})
-		allSlides[index].style.display = 'block'
-		current.textContent = `0${index + 1}`
-	}
+	prev.addEventListener('click', () => {
+		if (offset === 0) {
+			offset = +width.slice(0, width.length - 2) * (allSlides.length - 1)
+		} else {
+			offset -= +width.slice(0, width.length - 2)
+		}
+
+		slidesField.style.transform = `translateX(-${offset}px)`
+		if (indexOfSlide == 1) {
+			indexOfSlide = allSlides.length
+		} else {
+			indexOfSlide--
+		}
+
+		if (allSlides.length < 10) {
+			current.textContent = `0${indexOfSlide}`
+		} else {
+			current.textContent = indexOfSlide
+		}
+	})
 })
