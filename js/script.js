@@ -1,5 +1,3 @@
-const socket = io('https://SocketServer.ivanua1.repl.co')
-socket.emit('test', { username: 1 })
 window.addEventListener('DOMContentLoaded', () => {
 	// Tabs
 	const tabs = document.querySelectorAll('.tabheader__item'),
@@ -202,29 +200,6 @@ window.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	// const getResource = async url => {
-	// 	const resolve = await fetch(url)
-
-	// 	if (!resolve.ok) {
-	// 		throw new Error(`Could not fetch ${url}, status: ${resolve.status}`)
-	// 	}
-
-	// 	return await resolve.json()
-	// }
-
-	// getResource('http://localhost:3000/menu').then(data => {
-	// 	data.forEach(({ img, altimg, title, descr, price }) => {
-	// 		new MenuDescription(
-	// 			img,
-	// 			altimg,
-	// 			title,
-	// 			descr,
-	// 			price,
-	// 			'.menu .container'
-	// 		).render()
-	// 	})
-	// })
-
 	axios.get('http://localhost:3000/menu').then(data =>
 		data.data.forEach(({ img, altimg, title, descr, price }) => {
 			new MenuDescription(
@@ -237,44 +212,6 @@ window.addEventListener('DOMContentLoaded', () => {
 			).render()
 		})
 	)
-
-	// getResource('http://localhost:3000/menu').then(data => {
-	// 	createCard(data)
-	// })
-
-	// function createCard(data) {
-	// 	data.forEach(({ img, altimg, title, descr, price }) => {
-	// 		const element = document.createElement('div')
-
-	// 		element.classList.add('menu__item')
-
-	// 		element.innerHTML = `
-	// 		<img src=${img} alt=${altimg}>
-	// 		<h3 class="menu__item-subtitle">${title}</h3>
-	// 		<div class="menu__item-descr">${descr}</div>
-	// 		<div class="menu__item-divider"></div>
-	// 		<div class="menu__item-price">
-	// 			<div class="menu__item-cost">Цена:</div>
-	// 			<div class="menu__item-total"><span>${price}</span> грн/день</div>
-	// 		</div>
-	// 		`
-
-	// 		document.querySelector('.menu .container').append(element)
-	// 	})
-	// }
-
-	// Forms
-
-	// const phoneNumber =
-	// 		this.previousElementSibling.previousElementSibling.value.trim(),
-	// 	userName =
-	// 		this.previousElementSibling.previousElementSibling.previousElementSibling.value.trim()
-	// console.log(object)
-	// let test = socket.emit('sendData', object)
-
-	// test.addEventListener('load', () => {
-	// 	statusMessage.textContent = message.loading
-	// })
 
 	const forms = document.querySelectorAll('form')
 
@@ -367,18 +304,13 @@ window.addEventListener('DOMContentLoaded', () => {
 		total = document.querySelector('#total'),
 		slidesWrapper = document.querySelector('.offer__slider-wrapper'),
 		slidesField = document.querySelector('.offer__slider-inner'),
-		width = window.getComputedStyle(slidesWrapper).width
+		width = window.getComputedStyle(slidesWrapper).width,
+		allSlider = document.querySelector('.offer__slider')
 
 	let indexOfSlide = 1,
 		offset = 0
 
-	if (allSlides.length < 10) {
-		total.textContent = `0${allSlides.length}`
-		current.textContent = `0${indexOfSlide}`
-	} else {
-		total.textContent = allSlides.length
-		current.textContent = indexOfSlide
-	}
+	currentIndexOFSlide(allSlides)
 
 	slidesField.style.cssText = `
 		display: flex;
@@ -392,11 +324,29 @@ window.addEventListener('DOMContentLoaded', () => {
 		item.style.width = width
 	})
 
+	allSlider.style.position = 'relative'
+	const indicator = document.createElement('ol'),
+		dots = []
+
+	indicator.classList.add('carousel-indicators')
+	allSlider.append(indicator)
+
+	for (let i = 0; i < allSlides.length; i++) {
+		const dot = document.createElement('li')
+		dot.setAttribute('data-slide-to', i + 1)
+		dot.classList.add('dot')
+		if (i == 0) {
+			dot.style.opacity = 1
+		}
+		indicator.append(dot)
+		dots.push(dot)
+	}
+
 	next.addEventListener('click', () => {
-		if (offset === +width.slice(0, width.length - 2) * (allSlides.length - 1)) {
+		if (offset === takeDigital(width) * (allSlides.length - 1)) {
 			offset = 0
 		} else {
-			offset += +width.slice(0, width.length - 2)
+			offset += takeDigital(width)
 		}
 
 		slidesField.style.transform = `translateX(-${offset}px)`
@@ -406,18 +356,16 @@ window.addEventListener('DOMContentLoaded', () => {
 			indexOfSlide++
 		}
 
-		if (allSlides.length < 10) {
-			current.textContent = `0${indexOfSlide}`
-		} else {
-			current.textContent = indexOfSlide
-		}
+		currentIndexOFSlide(allSlides)
+
+		dotActive(dots)
 	})
 
 	prev.addEventListener('click', () => {
 		if (offset === 0) {
-			offset = +width.slice(0, width.length - 2) * (allSlides.length - 1)
+			offset = takeDigital(width) * (allSlides.length - 1)
 		} else {
-			offset -= +width.slice(0, width.length - 2)
+			offset -= takeDigital(width)
 		}
 
 		slidesField.style.transform = `translateX(-${offset}px)`
@@ -427,10 +375,116 @@ window.addEventListener('DOMContentLoaded', () => {
 			indexOfSlide--
 		}
 
-		if (allSlides.length < 10) {
+		currentIndexOFSlide(allSlides)
+		dotActive(dots)
+	})
+
+	dots.forEach(dot => {
+		dot.addEventListener('click', e => {
+			const slideTo = e.target.getAttribute('data-slide-to')
+
+			indexOfSlide = slideTo
+
+			offset = takeDigital(width) * (slideTo - 1)
+			slidesField.style.transform = `translateX(-${offset}px)`
+			dotActive(dots)
+			currentIndexOFSlide(allSlides)
+		})
+	})
+
+	function takeDigital(str) {
+		return +str.replace(/\D/g, '')
+	}
+
+	function dotActive(allDots) {
+		allDots.forEach(dot => (dot.style.opacity = '0.5'))
+		allDots[indexOfSlide - 1].style.opacity = 1
+	}
+
+	function currentIndexOFSlide(slides) {
+		if (slides.length < 10) {
+			total.textContent = `0${slides.length}`
 			current.textContent = `0${indexOfSlide}`
 		} else {
+			total.textContent = allSlides.length
 			current.textContent = indexOfSlide
 		}
-	})
+	}
+
+	// calculator
+
+	const result = document.querySelector('.calculating__result span')
+	let sex = 'female',
+		height,
+		weight,
+		age,
+		ratio = 1.375
+
+	function calcTotal() {
+		if (!sex || !height || !weight || !age || !ratio) {
+			result.textContent = '____'
+			return
+		}
+
+		if (sex === 'female') {
+			result.textContent = Math.round(
+				(447.6 + 9.2 * weight + 3.1 * height - 4.3 * age) * ratio
+			)
+		} else {
+			result.textContent = Math.round(
+				(88.36 + 13.4 * weight + 4.8 * height - 5.7 * age) * ratio
+			)
+		}
+	}
+
+	calcTotal()
+
+	function getStaticInformation(parentSelector, activeClass) {
+		const elements = document.querySelectorAll(`${parentSelector} div`)
+
+		elements.forEach(item => {
+			item.addEventListener('click', element => {
+				if (element.target.getAttribute('data-ratio')) {
+					ratio = +element.target.getAttribute('data-ratio')
+				} else {
+					sex = element.target.id
+				}
+				elements.forEach(item => {
+					item.classList.remove(activeClass)
+				})
+
+				element.target.classList.add(activeClass)
+				calcTotal()
+			})
+		})
+	}
+
+	getStaticInformation('#gender', 'calculating__choose-item_active')
+	getStaticInformation(
+		'.calculating__choose_big',
+		'calculating__choose-item_active'
+	)
+
+	function getDynamicInformation(inputSelector) {
+		const input = document.querySelector(inputSelector)
+
+		input.addEventListener('input', () => {
+			switch (input.getAttribute('id')) {
+				case 'height':
+					height = +input.value
+					break
+				case 'weight':
+					weight = +input.value
+					break
+				case 'age':
+					age = +input.value
+					console.log(age)
+					break
+			}
+			calcTotal()
+		})
+	}
+	getDynamicInformation('#height')
+	getDynamicInformation('#weight')
+	getDynamicInformation('#age')
 })
