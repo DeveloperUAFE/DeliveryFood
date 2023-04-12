@@ -1,4 +1,4 @@
-function slider() {
+export default function slider() {
 	const allSlides = document.querySelectorAll('.offer__slide'),
 		prev = document.querySelector('.offer__slider-prev'),
 		next = document.querySelector('.offer__slider-next'),
@@ -113,5 +113,3 @@ function slider() {
 		}
 	}
 }
-
-module.exports = slider

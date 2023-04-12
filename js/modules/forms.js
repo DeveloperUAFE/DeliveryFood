@@ -1,4 +1,6 @@
-function forms() {
+import { closeModal, openModal } from './modal'
+
+export default function forms() {
 	const forms = document.querySelectorAll('form')
 	const message = {
 		loading: 'img/form/spinner.svg',
@@ -59,7 +61,7 @@ function forms() {
 		const prevModalDialog = document.querySelector('.modal__dialog')
 
 		prevModalDialog.classList.add('hide')
-		openModal(modal, modalDialog)
+		openModal('.modal')
 
 		const thanksModal = document.createElement('div')
 		thanksModal.classList.add('modal__dialog')
@@ -76,9 +78,7 @@ function forms() {
 			thanksModal.remove()
 			prevModalDialog.classList.add('show')
 			prevModalDialog.classList.remove('hide')
-			closeModal(modal, modalDialog)
+			closeModal('.modal')
 		}, 4000)
 	}
 }
-
-module.exports = forms

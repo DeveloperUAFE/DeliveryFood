@@ -1,4 +1,4 @@
-function timer() {
+export default function timer() {
 	const deadLine = '2023-05-02'
 
 	function getTimeRemaining(endTime) {
@@ -50,5 +50,3 @@ function timer() {
 	}
 	setClock('.timer', deadLine)
 }
-
-module.exports = timer

@@ -1,4 +1,4 @@
-function cards() {
+export default function cards() {
 	class MenuDescription {
 		constructor(
 			image,
@@ -59,5 +59,3 @@ function cards() {
 		})
 	)
 }
-
-module.exports = cards

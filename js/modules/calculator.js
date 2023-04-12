@@ -1,4 +1,4 @@
-function calc() {
+export default function calc() {
 	console.log(+localStorage.getItem('ratio'))
 	const result = document.querySelector('.calculating__result span')
 	let sex, height, weight, age, ratio
@@ -114,5 +114,3 @@ function calc() {
 	getDynamicInformation('#weight')
 	getDynamicInformation('#age')
 }
-
-module.exports = calc
