@@ -1,7 +1,8 @@
+import { postData } from '../services/services'
 import { closeModal, openModal } from './modal'
 
-export default function forms() {
-	const forms = document.querySelectorAll('form')
+export default function forms(formSelector) {
+	const forms = document.querySelectorAll(formSelector)
 	const message = {
 		loading: 'img/form/spinner.svg',
 		success: "Thanks! I'll get you response! I'll call you soon.",
@@ -9,18 +10,6 @@ export default function forms() {
 	}
 
 	forms.forEach(item => bindPostData(item))
-
-	const postData = async (url, data) => {
-		const resolve = await fetch(url, {
-			method: 'POST',
-			headers: {
-				'Content-type': 'application/json',
-			},
-			body: data,
-		})
-
-		return await resolve.json()
-	}
 
 	function bindPostData(form) {
 		form.addEventListener('submit', event => {

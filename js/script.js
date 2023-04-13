@@ -12,11 +12,25 @@ window.addEventListener('DOMContentLoaded', () => {
 		50000
 	)
 
-	tabs()
+	tabs(
+		'.tabheader__item',
+		'.tabcontent',
+		'.tabheader__items',
+		'tabheader__item_active'
+	)
 	modal('.modal', '[data-modal]', modalTimerId)
 	cards()
-	forms()
+	forms('form')
 	calculator()
-	slider()
-	timer()
+	slider({
+		container: '.offer__slider',
+		nextArrow: '.offer__slider-next',
+		prevArrow: '.offer__slider-prev',
+		currentCounter: '#current',
+		totalCounter: '#total',
+		slide: '.offer__slide',
+		wrapper: '.offer__slider-wrapper',
+		field: '.offer__slider-inner',
+	})
+	timer('.timer', '2023-05-02')
 })

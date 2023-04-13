@@ -1,13 +1,22 @@
-export default function slider() {
-	const allSlides = document.querySelectorAll('.offer__slide'),
-		prev = document.querySelector('.offer__slider-prev'),
-		next = document.querySelector('.offer__slider-next'),
-		current = document.querySelector('#current'),
-		total = document.querySelector('#total'),
-		slidesWrapper = document.querySelector('.offer__slider-wrapper'),
-		slidesField = document.querySelector('.offer__slider-inner'),
+export default function slider({
+	container,
+	slide,
+	nextArrow,
+	prevArrow,
+	totalCounter,
+	currentCounter,
+	wrapper,
+	field,
+}) {
+	const allSlides = document.querySelectorAll(slide),
+		prev = document.querySelector(prevArrow),
+		next = document.querySelector(nextArrow),
+		current = document.querySelector(currentCounter),
+		total = document.querySelector(totalCounter),
+		slidesWrapper = document.querySelector(wrapper),
+		slidesField = document.querySelector(field),
 		width = window.getComputedStyle(slidesWrapper).width,
-		allSlider = document.querySelector('.offer__slider')
+		allSlider = document.querySelector(container)
 
 	let indexOfSlide = 1,
 		offset = 0
